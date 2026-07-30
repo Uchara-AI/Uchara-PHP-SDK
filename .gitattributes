@@ -1,0 +1,18 @@
+# Documentation
+/README.md export-ignore
+/CHANGELOG.md export-ignore
+/CONTRIBUTING.md export-ignore
+
+# Tests
+/tests/ export-ignore
+/phpunit.xml export-ignore
+/phpunit.xml.dist export-ignore
+
+# Dev tooling
+/phpstan.neon export-ignore
+/phpstan.neon.dist export-ignore
+/.github/ export-ignore
+
+# Git
+/.gitattributes export-ignore
+/.gitignore export-ignore

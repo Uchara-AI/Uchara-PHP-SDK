@@ -1,0 +1,59 @@
+{
+    "name": "uchara/uchara-php",
+    "description": "Official PHP SDK for Uchara Chat Platform — server-side API integration and visitor widget SDK",
+    "type": "library",
+    "keywords": ["uchara", "chat", "customer-support", "live-chat", "sdk", "laravel", "php"],
+    "homepage": "https://uchara.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Uchara Team",
+            "email": "developers@uchara.com"
+        }
+    ],
+    "support": {
+        "docs": "https://github.com/Uchara-AI/Uchara-PHP-SDK#readme",
+        "issues": "https://github.com/Uchara-AI/Uchara-PHP-SDK/issues",
+        "source": "https://github.com/Uchara-AI/Uchara-PHP-SDK"
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/Uchara-AI"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "guzzlehttp/guzzle": "^7.5",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0",
+        "phpstan/phpstan": "^1.10"
+    },
+    "suggest": {
+        "laravel/framework": "^10.0|^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Uchara\\SDK\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Uchara\\SDK\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Uchara\\SDK\\Laravel\\UcharaServiceProvider"
+            ],
+            "aliases": {
+                "Uchara": "Uchara\\SDK\\Laravel\\Facades\\Uchara"
+            }
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

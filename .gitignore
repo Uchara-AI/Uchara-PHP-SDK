@@ -1,0 +1,7 @@
+/vendor/
+/composer.lock
+.phpunit.result.cache
+.phpstan.cache
+.php-cs-fixer.cache
+.DS_Store
+Thumbs.db
