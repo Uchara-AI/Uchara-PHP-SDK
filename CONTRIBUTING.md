@@ -19,7 +19,7 @@ composer test
 ## Static Analysis
 
 ```bash
-composer phpstan
+composer analyse
 ```
 
 ## Coding Standards
@@ -35,7 +35,7 @@ composer phpstan
 2. Create a feature branch
 3. Write tests for any new functionality
 4. Ensure all tests pass (`composer test`)
-5. Run static analysis (`composer phpstan`)
+5. Run static analysis (`composer analyse`)
 6. Submit a pull request against the `main` branch
 
 ## Reporting Bugs

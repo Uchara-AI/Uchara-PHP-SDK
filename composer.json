@@ -31,6 +31,11 @@
         "phpunit/phpunit": "^10.0",
         "phpstan/phpstan": "^1.10"
     },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse --memory-limit=512M",
+        "validate": "composer validate --strict"
+    },
     "suggest": {
         "laravel/framework": "^10.0|^11.0"
     },

@@ -1,0 +1,9 @@
+parameters:
+    level: 6
+    paths:
+        - src
+    tmpDir: .phpstan.cache
+    ignoreErrors:
+        - identifier: missingType.iterableValue
+    excludePaths:
+        - src/Laravel
