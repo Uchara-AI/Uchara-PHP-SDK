@@ -2,6 +2,7 @@
 
 namespace Uchara\SDK\Laravel;
 
+use Uchara\SDK\AgentSDK;
 use Uchara\SDK\ServerSDK;
 use Uchara\SDK\Uchara;
 use Uchara\SDK\VisitorSDK;
@@ -19,6 +20,8 @@ class UcharaManager
     protected array $config;
 
     protected ?ServerSDK $server = null;
+
+    protected ?AgentSDK $agent = null;
 
     protected ?VisitorSDK $visitor = null;
 
@@ -58,6 +61,22 @@ class UcharaManager
         return $this->server;
     }
 
+    public function agent(): AgentSDK
+    {
+        if ($this->agent === null) {
+            $accessToken = $this->config['access_token'] ?? null;
+
+            $this->agent = Uchara::agent(
+                (string) ($this->config['api_url'] ?? ''),
+                is_string($accessToken) ? $accessToken : null,
+                (int) ($this->config['timeout'] ?? 30),
+                $this->config['client'] ?? null
+            );
+        }
+
+        return $this->agent;
+    }
+
     public function visitor(): VisitorSDK
     {
         if ($this->visitor === null) {
@@ -80,11 +99,13 @@ class UcharaManager
     /**
      * Return the default SDK based on the `default` config value.
      */
-    public function sdk(): ServerSDK|VisitorSDK
+    public function sdk(): ServerSDK|AgentSDK|VisitorSDK
     {
-        return ($this->config['default'] ?? 'server') === 'visitor'
-            ? $this->visitor()
-            : $this->server();
+        return match ($this->config['default'] ?? 'server') {
+            'agent' => $this->agent(),
+            'visitor' => $this->visitor(),
+            default => $this->server(),
+        };
     }
 
     /**

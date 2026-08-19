@@ -3,6 +3,7 @@
 namespace Uchara\SDK\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Uchara\SDK\AgentSDK;
 use Uchara\SDK\ServerSDK;
 use Uchara\SDK\Uchara;
 use Uchara\SDK\VisitorSDK;
@@ -17,10 +18,28 @@ class UcharaTest extends TestCase
         $this->assertInstanceOf(ServerSDK::class, $sdk);
     }
 
+    public function testAgentFactory(): void
+    {
+        $sdk = Uchara::agent('https://api.example.com', 'access-token', 30, $this->mockClient([]));
+        $this->assertInstanceOf(AgentSDK::class, $sdk);
+        $this->assertSame('access-token', $sdk->getAccessToken());
+    }
+
     public function testVisitorFactory(): void
     {
         $sdk = Uchara::visitor('https://api.example.com', 'widget-token', 30, $this->mockClient([]));
         $this->assertInstanceOf(VisitorSDK::class, $sdk);
+    }
+
+    public function testMakeAgent(): void
+    {
+        $sdk = Uchara::make([
+            'api_url' => 'https://api.example.com',
+            'access_token' => 'access-token',
+            'default' => 'agent',
+            'client' => $this->mockClient([]),
+        ]);
+        $this->assertInstanceOf(AgentSDK::class, $sdk);
     }
 
     public function testMakeDefaultsToServer(): void

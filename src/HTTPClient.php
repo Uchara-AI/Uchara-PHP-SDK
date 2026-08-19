@@ -25,6 +25,12 @@ class HTTPClient
     private string $baseUrl;
     private ?string $authToken = null;
 
+    /** @var callable|null */
+    private $onUnauthorized;
+
+    /** @var callable|null */
+    private $onRefresh;
+
     /** @var array<string,string> */
     private array $defaultHeaders = [];
 
@@ -47,6 +53,16 @@ class HTTPClient
     public function setAuthToken(string $token): void
     {
         $this->authToken = $token;
+    }
+
+    public function setOnUnauthorized(?callable $callback): void
+    {
+        $this->onUnauthorized = $callback;
+    }
+
+    public function setOnRefresh(?callable $callback): void
+    {
+        $this->onRefresh = $callback;
     }
 
     public function setDefaultHeader(string $name, string $value): void
@@ -117,7 +133,7 @@ class HTTPClient
      *
      * @throws UcharaException on transport errors or non-2xx responses
      */
-    public function request(string $method, string $path, array $options = []): UcharaResponse
+    public function request(string $method, string $path, array $options = [], bool $retry = true): UcharaResponse
     {
         $url = $this->baseUrl . $path;
 
@@ -151,6 +167,20 @@ class HTTPClient
             // Treat any non-2xx status as an error (the API uses 201 for
             // created resources, so success is the whole 2xx range).
             if ($statusCode < 200 || $statusCode >= 300) {
+                if (
+                    $statusCode === 401
+                    && $retry
+                    && $path !== '/v1/auth/refresh'
+                    && $this->onRefresh !== null
+                    && (bool) call_user_func($this->onRefresh)
+                ) {
+                    return $this->request($method, $path, $options, false);
+                }
+
+                if ($statusCode === 401 && $this->onUnauthorized !== null) {
+                    call_user_func($this->onUnauthorized);
+                }
+
                 $decoded = json_decode($body, true);
                 $err = is_array($decoded) ? ($decoded['error'] ?? null) : null;
 

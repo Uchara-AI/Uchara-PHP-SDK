@@ -3,6 +3,7 @@
 namespace Uchara\SDK\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Uchara\SDK\AgentSDK;
 use Uchara\SDK\Laravel\UcharaManager;
 use Uchara\SDK\ServerSDK;
 use Uchara\SDK\VisitorSDK;
@@ -31,6 +32,19 @@ class UcharaManagerTest extends TestCase
         $this->assertSame('https://api.example.com', $manager->config('api_url'));
         $this->assertNull($manager->config('missing'));
         $this->assertSame('fallback', $manager->config('missing', 'fallback'));
+    }
+
+    public function testAgentIsBuiltFromConfig(): void
+    {
+        $manager = new UcharaManager([
+            'api_url' => 'https://api.example.com',
+            'access_token' => 'access-token',
+            'default' => 'agent',
+        ]);
+
+        $this->assertInstanceOf(AgentSDK::class, $manager->agent());
+        $this->assertSame('access-token', $manager->agent()->getAccessToken());
+        $this->assertInstanceOf(AgentSDK::class, $manager->sdk());
     }
 
     public function testVisitorIsBuiltFromConfig(): void

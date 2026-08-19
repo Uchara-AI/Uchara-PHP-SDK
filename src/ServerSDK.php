@@ -37,6 +37,19 @@ class ServerSDK
     }
 
     /**
+     * Create a short-lived agent session for a browser dashboard.
+     *
+     * Keep the Server SDK API key on the backend. Pass the returned token pair
+     * to the browser and initialize AgentSDK there.
+     *
+     * @return array<string,mixed>
+     */
+    public function createAgentSession(string $email): array
+    {
+        return $this->http->post('/v1/auth/agent-token', ['email' => $email]);
+    }
+
+    /**
      * Return the underlying HTTP client (useful for advanced callers that need
      * status/meta via UcharaResponse).
      */

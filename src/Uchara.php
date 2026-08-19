@@ -7,8 +7,8 @@ use GuzzleHttp\Client;
 /**
  * Factory and static entry points for the Uchara SDK.
  *
- * Provides ergonomic constructors for both the Server and Visitor SDKs, plus a
- * `make()` helper that builds the appropriate SDK from a configuration array.
+ * Provides ergonomic constructors for the Server, Agent and Visitor SDKs,
+ * plus a `make()` helper that builds the appropriate SDK from a configuration array.
  */
 class Uchara
 {
@@ -20,6 +20,16 @@ class Uchara
     public static function server(string $apiUrl, ?string $apiKey = null, int $timeout = 30, ?Client $client = null): ServerSDK
     {
         return new ServerSDK($apiUrl, $apiKey, $timeout, $client);
+    }
+
+    /**
+     * Build an AgentSDK.
+     *
+     * @param Client|null $client Optional Guzzle client (injectable for tests).
+     */
+    public static function agent(string $apiUrl, ?string $accessToken = null, int $timeout = 30, ?Client $client = null): AgentSDK
+    {
+        return new AgentSDK($apiUrl, $accessToken, $timeout, $client);
     }
 
     /**
@@ -38,13 +48,14 @@ class Uchara
      * Supported keys:
      *  - api_url / base_url : API base URL (required)
      *  - api_key            : server API key
+     *  - access_token       : agent access token
      *  - widget_token       : widget token (required for the visitor SDK)
      *  - timeout            : request timeout in seconds (default 30)
-     *  - default            : 'server' (default) or 'visitor'
+     *  - default            : 'server' (default), 'agent' or 'visitor'
      *
      * @param array<string,mixed> $config
      */
-    public static function make(array $config): ServerSDK|VisitorSDK
+    public static function make(array $config): ServerSDK|AgentSDK|VisitorSDK
     {
         $apiUrl = $config['api_url'] ?? $config['base_url'] ?? null;
         if (!is_string($apiUrl) || $apiUrl === '') {
@@ -63,6 +74,12 @@ class Uchara
             }
 
             return new VisitorSDK($apiUrl, $widgetToken, $timeout, $client);
+        }
+
+        if ($type === 'agent') {
+            $accessToken = $config['access_token'] ?? null;
+
+            return new AgentSDK($apiUrl, is_string($accessToken) ? $accessToken : null, $timeout, $client);
         }
 
         $apiKey = $config['api_key'] ?? null;

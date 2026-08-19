@@ -15,6 +15,28 @@ class ServerSDKTest extends TestCase
         return new ServerSDK('https://api.example.com', 'uchara_sk_test', 30, $this->mockClient($responses, $history));
     }
 
+    public function testCreateAgentSessionUsesServerApiKey(): void
+    {
+        $history = [];
+        $sdk = $this->sdk([
+            $this->jsonResponse(200, [
+                'ok' => true,
+                'data' => [
+                    'token' => 'agent-access-token',
+                    'refresh_token' => 'agent-refresh-token',
+                    'member' => ['id' => 'member-1'],
+                ],
+            ]),
+        ], $history);
+
+        $session = $sdk->createAgentSession('agent@example.com');
+
+        $this->assertSame('agent-access-token', $session['token']);
+        $this->assertSame('/v1/auth/agent-token', $history[0]['request']->getUri()->getPath());
+        $this->assertSame('Bearer uchara_sk_test', $history[0]['request']->getHeaderLine('Authorization'));
+        $this->assertSame(['email' => 'agent@example.com'], json_decode((string) $history[0]['request']->getBody(), true));
+    }
+
     public function testListMembersSendsQuery(): void
     {
         $history = [];

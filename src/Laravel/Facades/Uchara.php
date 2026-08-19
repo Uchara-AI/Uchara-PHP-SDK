@@ -6,8 +6,9 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static \Uchara\SDK\ServerSDK server()
+ * @method static \Uchara\SDK\AgentSDK agent()
  * @method static \Uchara\SDK\VisitorSDK visitor()
- * @method static \Uchara\SDK\ServerSDK|\Uchara\SDK\VisitorSDK sdk()
+ * @method static \Uchara\SDK\ServerSDK|\Uchara\SDK\AgentSDK|\Uchara\SDK\VisitorSDK sdk()
  * @method static mixed config(?string $key = null, $default = null)
  *
  * @see \Uchara\SDK\Laravel\UcharaManager

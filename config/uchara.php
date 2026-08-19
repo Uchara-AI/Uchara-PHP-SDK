@@ -8,7 +8,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | The default SDK returned by the Uchara facade / manager when no explicit
-    | SDK is requested. Supported values: 'server' or 'visitor'.
+    | SDK is requested. Supported values: 'server', 'agent' or 'visitor'.
     |
     */
 
@@ -35,6 +35,18 @@ return [
     */
 
     'api_key' => env('UCHARA_API_KEY'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Agent Access Token
+    |--------------------------------------------------------------------------
+    |
+    | JWT access token for the Agent SDK. Agents can also authenticate at
+    | runtime with AgentSDK::login().
+    |
+    */
+
+    'access_token' => env('UCHARA_ACCESS_TOKEN'),
 
     /*
     |--------------------------------------------------------------------------

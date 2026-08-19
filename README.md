@@ -3,6 +3,7 @@
 Official PHP SDK for the Uchara Chat Platform. It provides:
 
 - **ServerSDK** — server-to-server integration with the authenticated `/v1/*` REST API (members/agents, invites, channels, bots, conversations, messages, contacts, canned responses, API keys).
+- **AgentSDK** — authenticate human workspace agents with email/password JWTs and send messages attributed to the logged-in agent.
 - **VisitorSDK** — embed the chat widget in customer applications via the public `/v1/widget/*` endpoints.
 - **Laravel integration** — a service provider, manager, facade and config file with auto-discovery for Laravel 10/11. The native SDK itself has **no Laravel dependency**.
 
@@ -113,6 +114,63 @@ $messages = $client->listMessages('conv_1');
 $messages = $client->getConversationMessages('conv_1');
 ```
 
+## Quick Start — Agent SDK
+
+Use `AgentSDK` when messages must appear as a specific human agent. The API derives
+`sender_type=agent` and `sender_id` from the access token, so do not provide those
+fields yourself.
+
+```php
+<?php
+
+require 'vendor/autoload.php';
+
+use Uchara\SDK\AgentSDK;
+
+$agent = new AgentSDK('https://api.uchara.com');
+$agent->login(
+    email: getenv('UCHARA_AGENT_EMAIL'),
+    password: getenv('UCHARA_AGENT_PASSWORD'),
+    workspaceSlug: getenv('UCHARA_WORKSPACE_SLUG') ?: null,
+);
+
+$message = $agent->sendMessage('conv_abc123', [
+    'content' => 'Halo, saya siap membantu.',
+]);
+```
+
+The access and refresh tokens are stored in the SDK instance. Refresh the session
+when needed:
+
+```php
+$agent->refresh();
+```
+
+### Secure backend-to-browser agent session
+
+For a custom browser dashboard, do not expose the Server API key. Create the
+short-lived agent session on your backend and return only the token pair to the
+browser:
+
+```php
+// Backend only — UCHARA_API_KEY must remain server-side.
+$server = new ServerSDK('https://api.uchara.com', getenv('UCHARA_API_KEY'));
+$session = $server->createAgentSession('agent@example.com');
+
+// Return $session to your dashboard frontend over your own authenticated HTTPS endpoint.
+```
+
+Then initialize the browser Agent SDK with the returned session:
+
+```ts
+const agent = new AgentSDK({ apiURL: 'https://api.uchara.com', autoConnect: false });
+agent.loginWithToken(session);
+```
+
+The `agent-token` endpoint verifies that the email belongs to an active member in
+the API key's workspace. Access tokens are short-lived; keep and rotate the refresh
+token according to your frontend session policy.
+
 ## Quick Start — Visitor SDK
 
 ```php
@@ -150,13 +208,16 @@ The `Uchara` factory builds SDK instances from a config array or directly:
 use Uchara\SDK\Uchara;
 
 $server = Uchara::server('https://api.uchara.com', 'uchara_sk_...');
+$agent = Uchara::agent('https://api.uchara.com');
 $visitor = Uchara::visitor('https://api.uchara.com', 'widget_token_...');
 
 // From a config array
 $sdk = Uchara::make([
     'api_url' => 'https://api.uchara.com',
-    'api_key' => 'uchara_sk_...',
-    'default' => 'server', // or 'visitor'
+     'api_key' => 'uchara_sk_...',
+     'access_token' => 'agent_access_token',
+     'default' => 'server', // or 'agent' or 'visitor'
+
 ]);
 ```
 
@@ -168,6 +229,7 @@ Set the environment variables and use the facade:
 // .env
 UCHARA_API_URL=https://api.uchara.com
 UCHARA_API_KEY=uchara_sk_...
+UCHARA_ACCESS_TOKEN=agent_access_token
 UCHARA_DEFAULT=server
 ```
 
@@ -176,6 +238,7 @@ use Uchara\SDK\Laravel\Facades\Uchara;
 
 $members = Uchara::listMembers();          // forwards to the default SDK
 $server  = Uchara::server();               // explicit ServerSDK
+$agent   = Uchara::agent();                // explicit AgentSDK
 $visitor = Uchara::visitor();              // explicit VisitorSDK
 ```
 

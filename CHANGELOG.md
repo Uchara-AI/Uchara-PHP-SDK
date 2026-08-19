@@ -5,9 +5,17 @@ All notable changes to the Uchara PHP SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-08-20
+
+### Changed
+
+- Hardened HTTP and Server SDK behavior and expanded agent/server integration support.
+- Added the current visitor and agent SDK API surface used by the platform.
+
 ## [1.1.0] - 2025-08-06
 
 ### Added
+- **AgentSDK** for email/password JWT authentication, token refresh, agent-scoped conversation operations and messages attributed to the authenticated human agent.
 - Workspace **members** management: `listMembers`, `getMember`, `createMember`,
   `updateMember`, `updateMemberRole`, `deactivateMember`, `reactivateMember`, `deleteMember`
   against `/v1/workspace/members`.
